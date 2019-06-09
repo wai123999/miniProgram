@@ -7,24 +7,44 @@ int main()
 {	int ch;
 	initscr();			/* Start curses mode 		*/
         int yMax,xMax; 
+        string menu_option[] = { "About","Enter the game..","Animation","Exit"};
+        int menu_option_length = sizeof(menu_option)/sizeof(menu_option[0]);
 	getmaxyx(stdscr,yMax,xMax);
-	WINDOW *menuwin = newwin(yMax-1,(xMax-1)/2,1,1);
-        WINDOW *otherwin = newwin(yMax-1,(xMax-1)/2-1,1,(xMax-1)/2 + 2);
-	box(menuwin,103,103);
-        box(otherwin,65,65);
+        int box_width = (xMax-1)/2;
+	WINDOW *menuwin = newwin(yMax-1,box_width,1,box_width/2);
+        box(menuwin,0,0);
         refresh();
+        wrefresh(menuwin);
+        int select = 0;
+        int highlight;
         noecho();
-        wrefresh(otherwin);
-        wrefresh(menuwin);
-        string b = "alex";
-        string c = "keeper";
-        wgetch(otherwin);
-        mvwprintw(otherwin,1,1,b.c_str());
-        wrefresh(otherwin);
-        wgetch(menuwin);
-        mvwprintw(menuwin,1,1,c.c_str());
-        wrefresh(menuwin);
-        wgetch(menuwin);
+        keypad(menuwin,true); //turn on the keypad
+        while (1)
+        {
+          //use a for loop to make color of current choice
+          for ( int i = 0; i < menu_option_length ; i++ )
+          {
+               if ( select == i ) wattron(menuwin,A_REVERSE);
+               mvwprintw(menuwin,i+5,box_width/2-menu_option[i].length()/2,menu_option[i].c_str());
+               wattroff(menuwin,A_REVERSE);
+          }
+          wrefresh(menuwin);
+          highlight  = wgetch(menuwin);
+          switch ( highlight )
+          { 
+          	case KEY_DOWN:
+                     if ( select < menu_option_length - 1)
+                         select++;
+                     break;
+                case KEY_UP:
+                     if ( select > 0 )
+		     	 select--;
+           	default:
+			break;
+
+          }
+        }
+        getch();
         endwin();		
 	return 0;
 }
