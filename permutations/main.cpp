@@ -10,7 +10,7 @@ string arrayToString(char *,int );
 void printStringArray(string *,int );
 
 int main(int argc , char* argv[]){
-     char a[5] = {'a','b','c','d','e'} ;
+     char a[5] = {'a','a','a','a','e'} ;
      char position[5] = {'\0'};
      string permutation[1000] = { "\0"};
      int p = 0;
