@@ -10,9 +10,10 @@ using namespace std;
 #define TYPE_BACKSPACE 127
 void enterGamePage();
 void enterAboutPage();
-void enterAnimationPage();
+void enterPainterPage();
 int yMax,xMax;
 int box_width;
+
 
 enum MENU_OPTION {
     ABOUT = 0 ,
@@ -23,7 +24,7 @@ enum MENU_OPTION {
 
 void enterMenuPage(){
 	int highlight;
-        string menu_option[] = { "About","Enter the game..","Animation","Exit"};
+        string menu_option[] = { "About","Enter the game..","Painter","Exit"};
         int menu_option_length = sizeof(menu_option)/sizeof(menu_option[0]);
 	//WINDOW *menuwin = newwin(yMax-1,box_width,1,box_width/2);
 	WINDOW *menuwin = newwin(yMax-1,box_width,1,box_width/2);
@@ -73,29 +74,49 @@ void enterMenuPage(){
 		enterGamePage();
 	}
 	else if ( select == 2 ){
-		enterAnimationPage();
+		enterPainterPage();
         }
 	else if ( select == 3 ){
-			
 
         }
 
 }
-void enterAnimationPage(){
+void enterPainterPage(){
 	WINDOW *animationwin = newwin(yMax-1,box_width,1,box_width/2);
 	box(animationwin,(int)'+',(int)'+');
 	keypad(animationwin,true);
+	mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION  ,NULL);	
+	printf("\033[?1003h\n"); // Makes the terminal report mouse movement events
+	//mousemask(REPORT_MOUSE_POSITION  | BUTTON1_PRESSED ,NULL);	
 	mvwprintw(animationwin,1,box_width/2 - 9 , "%s","Let's go to the animation....haha");
 	refresh();
 	wrefresh(animationwin);
 	int k ;
+	int y,x;
 	while(1){
 		k = wgetch(animationwin);
-		if ( k == KEY_BACKSPACE){
+		if ( k == KEY_BACKSPACE)
+		{
 		  	enterMenuPage();
 			return;
         	}
-		
+		else if ( k == KEY_MOUSE )
+		{
+			mvwprintw(animationwin,10,box_width/2 - 9 , "%s","Mouse click");
+			MEVENT event;
+      			if (getmouse(&event) == OK) {
+                 		mvwaddch(animationwin,event.y - 1,event.x - box_width/2,'o'); 
+			}
+			else{
+			}
+      		}
+		else{
+			mvwprintw(animationwin,30,10,"%s","Something wrong");
+		}
+		wmove(animationwin,0,0);
+	        insertln();
+    		clrtoeol();
+		wmove(animationwin,0,0);
 	}
 
 }
