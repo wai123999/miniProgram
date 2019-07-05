@@ -33,9 +33,16 @@ void enterMenuPage(){
         wrefresh(menuwin);
         noecho();
 	int select = 0;
+	char o[4] = {'/','|','\\','-'};
+	int a = 0;
         keypad(menuwin,true); //turn on the keypad
+
+	wtimeout(menuwin,400);
         while (1)
         {
+          mvwprintw(menuwin,1,1,"%c",o[a]);
+	  a++;
+	  if ( a > 3 ) a = 0;
           //use a for loop to make print menu string
           for ( int i = 0; i < menu_option_length ; i++ )
           {
@@ -55,12 +62,12 @@ void enterMenuPage(){
                 case KEY_UP:
                      if ( select > 0 )
 		     	select--;
-			break;
+	             break;
 		case TYPE_ENTER:
 			flag = true;
-			break;
+		     break;
            	default:
-			break;
+		     break;
 
           }
 	  if ( flag ) { break;}
@@ -75,6 +82,7 @@ void enterMenuPage(){
 	}
 	else if ( select == 2 ){
 		enterPainterPage();
+		
         }
 	else if ( select == 3 ){
 
@@ -82,42 +90,48 @@ void enterMenuPage(){
 
 }
 void enterPainterPage(){
-	WINDOW *animationwin = newwin(yMax-1,box_width,1,box_width/2);
-	box(animationwin,(int)'+',(int)'+');
-	keypad(animationwin,true);
-	mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION  ,NULL);	
+	WINDOW *painterwin = newwin(yMax-1,box_width,1,box_width/2);
+	box(painterwin,(int)'+',(int)'+');
+	keypad(painterwin,true);
+	mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION ,NULL);	
 	printf("\033[?1003h\n"); // Makes the terminal report mouse movement events
 	//mousemask(REPORT_MOUSE_POSITION  | BUTTON1_PRESSED ,NULL);	
-	mvwprintw(animationwin,1,box_width/2 - 9 , "%s","Let's go to the animation....haha");
+	mvwprintw(painterwin,1,box_width/2 - 9 , "%s","Press Enter will draw....");
 	refresh();
-	wrefresh(animationwin);
+	wrefresh(painterwin);
 	int k ;
 	int y,x;
+	bool flag = false;
 	while(1){
-		k = wgetch(animationwin);
+		k = wgetch(painterwin);
 		if ( k == KEY_BACKSPACE)
 		{
 		  	enterMenuPage();
 			return;
         	}
-		else if ( k == KEY_MOUSE )
+		else if ( k == TYPE_ENTER)
 		{
-			mvwprintw(animationwin,10,box_width/2 - 9 , "%s","Mouse click");
-			MEVENT event;
-      			if (getmouse(&event) == OK) {
-                 		mvwaddch(animationwin,event.y - 1,event.x - box_width/2,'o'); 
+			mvwprintw(painterwin,3,box_width/2 - 9 , "%s","Press a key to stop the draw....");
+			while(1){
+				k = wgetch(painterwin);
+				if ( k == KEY_MOUSE )
+				{
+					//mvwprintw(painterwin,10,box_width/2 - 9 , "%s","Mouse click");
+					MEVENT event;
+      					if (getmouse(&event) == OK) {
+                 				mvwaddch(painterwin,event.y - 1,event.x - box_width/2,'o'); 
+					}
+      				}
+				else{
+					mousemask(0x11111111,NULL);
+					flag = true;
+					break;		    	
+				}
 			}
-			else{
-			}
-      		}
-		else{
-			mvwprintw(animationwin,30,10,"%s","Something wrong");
 		}
-		wmove(animationwin,0,0);
-	        insertln();
-    		clrtoeol();
-		wmove(animationwin,0,0);
+		if ( flag ){ break; }
 	}
+	wgetch(painterwin);
 
 }
 void enterAboutPage(){
